@@ -1,0 +1,4 @@
+django
+pymongo
+python-dotenv
+python-reloader
