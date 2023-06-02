@@ -11,21 +11,21 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-import pymongo
+# import pymongo
 
-# MongoDB connection settings
-MONGO_HOST = 'uitcommerce.oyuchwj.mongodb.net'
-MONGO_USERNAME = 'uitcommerce'
-MONGO_PASSWORD = 'uitcommerce'
-MONGO_DATABASE = 'UITCommerce'
+# # MongoDB connection settings
+# MONGO_HOST = 'uitcommerce.oyuchwj.mongodb.net'
+# MONGO_USERNAME = 'uitcommerce'
+# MONGO_PASSWORD = 'uitcommerce'
+# MONGO_DATABASE = 'UITCommerce'
 
-# Create MongoDB client
-mongo_client = pymongo.MongoClient(
-    f"mongodb+srv://{MONGO_USERNAME}:{MONGO_PASSWORD}@{MONGO_HOST}/{MONGO_DATABASE}?retryWrites=true&w=majority"
-)
+# # Create MongoDB client
+# mongo_client = pymongo.MongoClient(
+#     f"mongodb+srv://{MONGO_USERNAME}:{MONGO_PASSWORD}@{MONGO_HOST}/{MONGO_DATABASE}?retryWrites=true&w=majority"
+# )
 
-# MongoDB database
-MONGO_DB = mongo_client[MONGO_DATABASE]
+# # MongoDB database
+# MONGO_DB = mongo_client[MONGO_DATABASE]
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'api'
 ]
 
 MIDDLEWARE = [

@@ -2,3 +2,7 @@ django
 pymongo
 python-dotenv
 python-reloader
+bcrypt
+djangorestframework
+django-rest-framework-mongoengine
+pillow
