@@ -8,3 +8,5 @@ django-rest-framework-mongoengine
 mongoengine
 pillow
 gunicorn
+django-cors-headers
+

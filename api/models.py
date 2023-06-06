@@ -12,7 +12,7 @@ class User(Document):
 
 class Shop(Document):
     name = StringField(max_length=100, required=True)
-    hotline = StringField(required=True)
+    hotline = StringField()
     email = EmailField(required=True)
     address = StringField()
     password = StringField(required=True)
