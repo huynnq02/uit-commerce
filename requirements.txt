@@ -6,4 +6,4 @@ bcrypt
 djangorestframework
 django-rest-framework-mongoengine
 pillow
-guicorn
+gunicorn
