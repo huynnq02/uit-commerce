@@ -9,4 +9,5 @@ mongoengine
 pillow
 gunicorn
 django-cors-headers
-
+python-dotenv
+cloudinary

@@ -1,4 +1,4 @@
-from mongoengine import Document, StringField, EmailField, DecimalField, ImageField, ReferenceField, ListField, LazyReferenceField
+from mongoengine import Document, StringField, EmailField, DecimalField, ImageField, ReferenceField, ListField, LazyReferenceField, BooleanField
 
 class User(Document):
     name = StringField(required=True)
@@ -26,11 +26,16 @@ class Item(Document):
     name = StringField(required=True, max_length=100)
     price = DecimalField(required=True, precision=2)
     discount = DecimalField(required=True, precision=2)
+    quantity = DecimalField(required=True)
     description = StringField(required=True)
-    color = StringField(required=True, max_length=50)
-    dimension = StringField(required=True, max_length=10)
+    color = ListField(StringField(required=True, max_length=50))
+    size = ListField(StringField(required=True, max_length=10))
+    category = StringField(required=True)
     image = ImageField(required=True)
+    detail_image = ListField(ImageField(required=True))
     shop = LazyReferenceField(Shop, required=True, reverse_delete_rule=2)
+    active = BooleanField(default=True)
+    
     meta = {
         'collection': 'items'  # Specify the collection name as 'items'
     }
