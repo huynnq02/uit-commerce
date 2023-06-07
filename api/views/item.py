@@ -4,7 +4,7 @@ from rest_framework import status
 from ..models import Item, Shop
 import cloudinary
 import cloudinary.uploader
-
+from ..serializers import ItemSerializer
 from decimal import Decimal
 
 
@@ -120,3 +120,12 @@ def delete_item(request, id):
         return Response({'success': True, 'message': 'Item deleted successfully'}, status=status.HTTP_200_OK)
     except Item.DoesNotExist:
         return Response({'success': False, 'message': 'Item not found'}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+def get_all_items(request):
+    try:
+        items = Item.objects.all()
+        items_data = ItemSerializer(items, many=True).data
+        return Response({'success': True, 'message': 'Items retrieved successfully', 'data': items_data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'success': False, 'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

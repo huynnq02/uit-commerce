@@ -5,9 +5,11 @@ class UserSerializer(DocumentSerializer):
     class Meta:
         model = User
 
-class ItemSerializer(DocumentSerializer):
-    class Meta:
-        model = Item
 class ShopSerializer(DocumentSerializer):
     class Meta:
         model = Shop
+ 
+class ItemSerializer(DocumentSerializer):
+    shop = ShopSerializer()
+    class Meta:
+        model = Item

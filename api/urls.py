@@ -10,6 +10,7 @@ urlpatterns = [
     path('items/create_item/<str:shop_id>', item.create_item, name='create_item'),
     path('items/update_item', item.update_item, name='update_item'),
     path('items/delete_item/<str:id>', item.delete_item, name='delete_item'),
+    path('items/get_all_items', item.get_all_items, name='get_all_items'),
 
     # Region create shop routers
     path('auth/create_shop', shop.create_shop, name='create_shop'),
