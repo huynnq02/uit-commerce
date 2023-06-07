@@ -16,5 +16,7 @@ urlpatterns = [
     path('auth/login_shop', shop.login_shop, name='login_shop'),
     path('shops/update_shop', shop.update_shop, name='update_shop'),
     path('shops/delete_shop/<str:id>', shop.delete_shop, name='delete_shop'),
+    path('shops/get_all_shop_items/<str:shop_id>', shop.get_all_shop_items, name='get_all_shop_items'),
+
 
 ]

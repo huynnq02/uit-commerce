@@ -24,16 +24,16 @@ class Shop(Document):
 
 class Item(Document):
     name = StringField(required=True, max_length=100)
-    price = DecimalField(required=True, precision=2)
-    discount = DecimalField(required=True, precision=2)
-    quantity = DecimalField(required=True)
+    price = DecimalField(required=True, precision=2, min_value=0)
+    discount = DecimalField(required=True, precision=2, min_value=0)
+    quantity = DecimalField(required=True, min_value=0)
     description = StringField(required=True)
-    color = ListField(StringField(required=True, max_length=50))
-    size = ListField(StringField(required=True, max_length=10))
+    color = ListField(StringField(required=True))
+    size = ListField(StringField(required=True))
     category = StringField(required=True)
-    image = ImageField(required=True)
-    detail_image = ListField(ImageField(required=True))
-    shop = LazyReferenceField(Shop, required=True, reverse_delete_rule=2)
+    image = StringField(required=True)
+    detail_image = ListField(StringField(required=True))
+    shop = ReferenceField(Shop, reverse_delete_rule=2)
     active = BooleanField(default=True)
     
     meta = {
