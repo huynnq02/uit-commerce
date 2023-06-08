@@ -6,7 +6,7 @@ import cloudinary
 import cloudinary.uploader
 from ..serializers import ItemSerializer
 from decimal import Decimal
-
+from utils.CustomPagination import CustomPagination
 
 @api_view(['POST'])
 def create_item(request, shop_id):
@@ -14,8 +14,8 @@ def create_item(request, shop_id):
 
     try:
         shop = Shop.objects.get(id=shop_id)
-
-        required_fields = ['name', 'price', 'discount', 'quantity', 'description', 'color', 'size', 'category']
+        print(1)
+        required_fields = ['name', 'price', 'discount', 'quantity', 'description', 'colors', 'sizes', 'category']
         missing_fields = [field for field in required_fields if field not in data]
 
         if missing_fields:
@@ -28,9 +28,11 @@ def create_item(request, shop_id):
             quantity = Decimal(data['quantity'])
         except (ValueError, TypeError, Decimal.InvalidOperation):
             return Response({'success': False, 'message': 'Invalid decimal values'}, status=status.HTTP_400_BAD_REQUEST)
+        print(2)
 
         # Handle main image upload to Cloudinary
         image_file = request.FILES.get('image')
+        print(image_file)
         if image_file:
             uploaded_image = cloudinary.uploader.upload(image_file)
             image_url = uploaded_image['secure_url']
@@ -39,10 +41,12 @@ def create_item(request, shop_id):
 
         # Handle detail images upload to Cloudinary
         detail_images = request.FILES.getlist('detail_image')
+        print(detail_images)
         uploaded_detail_images = []
         for detail_image_file in detail_images:
             uploaded_detail_image = cloudinary.uploader.upload(detail_image_file)
             uploaded_detail_images.append(uploaded_detail_image['secure_url'])
+        print(3)
 
         item_data = {
             'name': data['name'],
@@ -50,23 +54,29 @@ def create_item(request, shop_id):
             'discount': discount,
             'quantity': quantity,
             'description': data['description'],
-            'color': [color.strip() for color in data['color'].split(',')],
-            'size': [size.strip() for size in data['size'].split(',')],  # Convert to list
+            'colors': [colors.strip() for colors in data['colors'].split(',')],
+            'sizes': [sizes.strip() for sizes in data['sizes'].split(',')],  # Convert to list
             'category': data['category'],
             'image': image_url,
             'detail_image': uploaded_detail_images,
             'shop': str(shop.id),  # Convert Shop object to its ID
             'active': True
         }
+        print(4)
 
         item = Item(**item_data)
+        print(5)
         item.save()
+        print(6)
 
         shop.items.append(item)
+        print(7)
         shop.save()
+        print(8)
 
         item_data['image'] = str(item_data['image'])
         item_data['detail_image'] = [str(image) for image in item_data['detail_image']]
+        print(6)
 
         return Response({'success': True, 'message': 'Item created successfully', 'data': item_data}, status=status.HTTP_201_CREATED)
     except Exception as e:
@@ -121,11 +131,15 @@ def delete_item(request, id):
     except Item.DoesNotExist:
         return Response({'success': False, 'message': 'Item not found'}, status=status.HTTP_404_NOT_FOUND)
 
+
+
 @api_view(['GET'])
 def get_all_items(request):
     try:
+        paginator = CustomPagination()
         items = Item.objects.all()
-        items_data = ItemSerializer(items, many=True).data
-        return Response({'success': True, 'message': 'Items retrieved successfully', 'data': items_data}, status=status.HTTP_200_OK)
+        result_page = paginator.paginate_queryset(items, request)
+        serializer = ItemSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
     except Exception as e:
         return Response({'success': False, 'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

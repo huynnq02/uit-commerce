@@ -28,8 +28,8 @@ class Item(Document):
     discount = DecimalField(required=True, precision=2, min_value=0)
     quantity = DecimalField(required=True, min_value=0)
     description = StringField(required=True)
-    color = ListField(StringField(required=True))
-    size = ListField(StringField(required=True))
+    colors = ListField(StringField(required=True))
+    sizes = ListField(StringField(required=True))
     category = StringField(required=True)
     image = StringField(required=True)
     detail_image = ListField(StringField(required=True))
@@ -38,4 +38,15 @@ class Item(Document):
     
     meta = {
         'collection': 'items'  # Specify the collection name as 'items'
+    }
+
+class Order(Document):
+    user = ReferenceField(User)
+    shop = ReferenceField(Shop)
+    item = ReferenceField(Item)
+    time = StringField()
+    status = StringField()
+    
+    meta = {
+        'collection': 'orders'  # Specify the collection name as 'orders'
     }
