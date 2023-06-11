@@ -9,7 +9,6 @@ class User(Document):
     meta = {
         'collection': 'users'  # Specify the collection name as 'users'
     }
-
 class Shop(Document):
     name = StringField(max_length=100, required=True)
     hotline = StringField()
@@ -21,7 +20,6 @@ class Shop(Document):
     meta = {
         'collection': 'shops'  # Specify the collection name as 'shops'
     }
-
 class Item(Document):
     name = StringField(required=True, max_length=100)
     price = DecimalField(required=True, precision=2, min_value=0)
@@ -39,7 +37,6 @@ class Item(Document):
     meta = {
         'collection': 'items'  # Specify the collection name as 'items'
     }
-
 class Order(Document):
     user = ReferenceField(User)
     shop = ReferenceField(Shop)
@@ -49,4 +46,36 @@ class Order(Document):
     
     meta = {
         'collection': 'orders'  # Specify the collection name as 'orders'
+    }
+class Category(Document):
+    name = StringField(required=True, max_length=100)
+
+    meta = {
+        'collection': 'categories'  # Specify the collection name as 'categories'
+    }
+class Bill(Document):
+    order = ReferenceField(Order)
+    time = StringField()
+
+    meta = {
+        'collection': 'bills'  # Specify the collection name as 'bills'
+    }
+class Review(Document):
+    item = ReferenceField(Item)
+    user = ReferenceField(User)
+    order = ReferenceField(Order)
+    shop = ReferenceField(Shop)
+    content = StringField(required=True)
+
+    meta = {
+        'collection': 'reviews'  # Specify the collection name as 'reviews'
+    }
+class Report(Document):
+    user = ReferenceField(User)
+    shop = ReferenceField(Shop)
+    item = ReferenceField(Item)  # Only required if user reports a shop
+    content = StringField(required=True)
+
+    meta = {
+        'collection': 'reports'  # Specify the collection name as 'reports'
     }
