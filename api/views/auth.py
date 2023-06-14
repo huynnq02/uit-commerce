@@ -3,7 +3,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.forms.models import model_to_dict
 from ..serializers import UserSerializer
-
+import cloudinary
+import cloudinary.uploader
 from ..models import User
 from ..config import *
 import bcrypt
@@ -11,6 +12,18 @@ import bcrypt
 
 @api_view(['POST'])
 def create_user(request):
+    """
+    Create a new user.
+
+    Required POST parameters:
+    - email: The email of the user.
+    - password: The password of the user.
+
+    Returns:
+    - If the user is successfully created, returns a success message with status 201 CREATED.
+    - If the email already exists, returns an error message with status 409 CONFLICT.
+    - If an error occurs during the process, returns an error message with status 500 INTERNAL SERVER ERROR.
+    """
     try:
         email = request.data.get('email')
         print(email)
@@ -29,26 +42,60 @@ def create_user(request):
     except Exception as e:
         return Response({'success': False, 'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
 @api_view(['PUT'])
 def update_user(request, id):
+    """
+    Update an existing user.
+
+    Required PUT parameters:
+    - Any field(s) that need to be updated, except 'id'.
+    - If the 'picture' field is provided, it will be uploaded to Cloudinary and the URL will be stored in 'profile_picture' field of the user.
+
+    Returns:
+    - If the user is successfully updated, returns a success message with status 200 OK, along with the updated user data.
+    - If the user is not found, returns an error message with status 404 NOT FOUND.
+    - If an error occurs during the process, returns an error message with status 500 INTERNAL SERVER ERROR.
+    """
     try:
         user = User.objects.get(id=id)
-        email = request.data.get('email')
-        if email and User.objects(email=email, id__ne=id).count() > 0:
-            return Response({'success': False, 'message': 'Email already exists'}, status=status.HTTP_409_CONFLICT)
 
-        user.email = email or user.email
+        # Update the user fields based on the data provided in the request body
+        for key, value in request.data.items():
+            if key == 'id':
+                continue
+            if key == 'picture':
+                # Upload the picture to Cloudinary and get the URL
+                upload_result = cloudinary.uploader.upload(value)
+                profile_picture_url = upload_result['secure_url']
+                setattr(user, 'profile_picture', profile_picture_url)
+            else:
+                setattr(user, key, value)
+
         user.save()
+        user_data = UserSerializer(user).data
+        return Response({'success': True, 'message': 'User update successful', 'data': user_data}, status=status.HTTP_200_OK)
 
-        return Response({'success': True, 'message': 'User updated successfully'}, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({'success': False, 'message': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
     except Exception as e:
         return Response({'success': False, 'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
 @api_view(['POST'])
 def login_user(request):
+    """
+    Authenticate and login a user.
+
+    Required POST parameters:
+    - email: The email of the user.
+    - password: The password of the user.
+
+    Returns:
+    - If the email and password match, returns a success message with status 200 OK, along with the user data.
+    - If the email is not found, returns an error message with status 404 NOT FOUND.
+    - If the password is incorrect, returns an error message with status 401 UNAUTHORIZED.
+    - If an error occurs during the process, returns an error message with status 500 INTERNAL SERVER ERROR.
+    """
     try:
         email = request.data.get('email')
         password = request.data.get('password')
@@ -58,14 +105,14 @@ def login_user(request):
         if is_match:
             user_data = UserSerializer(user).data
             # Password is correct, authentication successful
-            return Response({'success': True, 'message': 'Login successful', 'data': user_data}, status=status.HTTP_200_OK)
+            return Response({'success': True, 'message': 'Login successful', 'data': user_data}, status=200)
         else:
             # Password is incorrect
-            return Response({'success': False, 'message': 'Incorrect password'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'success': False, 'message': 'Incorrect password'}, status=401)
 
     except User.DoesNotExist:
         # User not found
-        return Response({'success': False, 'message': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'success': False, 'message': 'User not found'}, status=404)
 
     except Exception as e:
-        return Response({'success': False, 'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({'success': False, 'message': str(e)}, status=500)

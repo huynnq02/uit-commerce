@@ -13,10 +13,10 @@ class ItemSerializer(DocumentSerializer):
     shop = ShopSerializer()
     class Meta:
         model = Item
+
 class OrderSerializer(DocumentSerializer):
     user = UserSerializer()
-    shop = ShopSerializer
-    item = ItemSerializer
+    shop = ShopSerializer()
     class Meta:
         model = Order
 

@@ -17,7 +17,8 @@ urlpatterns = [
     path('auth/login_shop', shop.login_shop, name='login_shop'),
     path('shops/update_shop', shop.update_shop, name='update_shop'),
     path('shops/delete_shop/<str:id>', shop.delete_shop, name='delete_shop'),
-    path('shops/get_all_shop_items/<str:shop_id>', shop.get_all_shop_items, name='get_all_shop_items'),
+    path('items/get_all_shop_items/<str:id>', shop.get_all_shop_items, name='get_all_shop_items'),
+    path('shops/get_list_customers/<str:id>', shop.get_list_customers, name='get_list_customer'),
 
     # Region create category routers
     path('categories/create_category', category.create_category, name='create_category'),
@@ -47,4 +48,10 @@ urlpatterns = [
     path('bills/get_all_bills', bill.get_all_bills, name='get_all_bills'),
     path('bills/get_bill/<str:id>', bill.get_bill, name='get_bill'),
 
+    # Region create order routers
+    path('orders/create_order', order.create_order, name='create_order'),
+    path('orders/update_order/<str:id>', order.update_order, name='update_order'),
+    path('orders/delete_order/<str:id>', order.delete_order, name='delete_order'),
+    path('orders/get_user_orders/<str:id>', order.get_user_orders, name='get_user_orders'),
+    path('orders/get_shop_orders/<str:id>', order.get_shop_orders, name='get_shop_orders'),
 ]

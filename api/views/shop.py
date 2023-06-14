@@ -2,9 +2,9 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from django.forms.models import model_to_dict
-from ..models import Shop, Item
+from ..models import Shop, Item, User, Order
 import bcrypt
-from ..serializers import ShopSerializer, ItemSerializer
+from ..serializers import ShopSerializer, ItemSerializer, UserSerializer
 
 @api_view(['POST'])
 def create_shop(request):
@@ -74,12 +74,57 @@ def login_shop(request):
 
 # get all shop items
 @api_view(['GET'])
-def get_all_shop_items(request, shop_id):
+def get_all_shop_items(request, id):
     try:
-        shop = Shop.objects.get(id=shop_id)
+        shop = Shop.objects.get(id=id)
         items = Item.objects.filter(shop=shop)
         items_data = ItemSerializer(items, many=True).data
         return Response({'success': True, 'message': 'Shop items fetched successfully', 'data': items_data}, status=status.HTTP_200_OK)
+    except Shop.DoesNotExist:
+        return Response({'success': False, 'message': 'Shop not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({'success': False, 'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    
+@api_view(['GET'])
+def get_list_customers(request, id):
+    """
+    Retrieve user information, number of orders, and number of bills for each user associated with a given shop.
+
+    Args:
+        id (str): The ID of the shop.
+
+    Returns:
+        Response: A response object containing the result of the operation.
+
+    Raises:
+        Shop.DoesNotExist: If the shop with the specified ID does not exist.
+        Exception: If any other error occurs during the process.
+    """
+    try:
+        shop = Shop.objects.get(id=id)
+        
+      
+        # get list user Id from list order_ids
+        user_ids = [order.user.id for order in Order.objects.filter(shop=shop)]
+        # get list user from list user_ids
+        print(user_ids)
+        users = User.objects.filter(id__in=user_ids)
+        print(users)
+        user_info = []
+        for user in users:
+            orders = Order.objects.filter(user=user, shop=shop)
+            total_orders = orders.count()
+            total_bills = sum(order.total for order in orders)
+
+            user_data = {
+                'user': UserSerializer(user).data,
+                'num_orders': total_orders,
+                'total_bills': total_bills
+            }
+            user_info.append(user_data)
+
+        return Response({'success': True, 'message': 'Shop user information fetched successfully', 'data': user_info}, status=status.HTTP_200_OK)
     except Shop.DoesNotExist:
         return Response({'success': False, 'message': 'Shop not found'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:

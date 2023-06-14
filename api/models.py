@@ -1,4 +1,4 @@
-from mongoengine import Document, StringField, EmailField, DecimalField, ImageField, ReferenceField, ListField, LazyReferenceField, BooleanField
+from mongoengine import Document, StringField, EmailField, DecimalField, DictField, ReferenceField, ListField, LazyReferenceField, BooleanField
 
 class User(Document):
     name = StringField(required=True)
@@ -6,6 +6,8 @@ class User(Document):
     email = EmailField(required=True)
     address = StringField()
     password = StringField(required=True)
+    profile_picture = StringField()
+    orders = ListField(ReferenceField('Order'))
     meta = {
         'collection': 'users'  # Specify the collection name as 'users'
     }
@@ -40,10 +42,11 @@ class Item(Document):
 class Order(Document):
     user = ReferenceField(User)
     shop = ReferenceField(Shop)
-    item = ReferenceField(Item)
-    time = StringField()
+    items = ListField(DictField())
     status = StringField()
-    
+    address = StringField()
+    total = DecimalField()
+    time = StringField()
     meta = {
         'collection': 'orders'  # Specify the collection name as 'orders'
     }
