@@ -7,7 +7,7 @@ from ..serializers import ReviewSerializer
 @api_view(['POST'])
 def create_review(request):
     data = request.data
-    required_fields = ['title', 'content']
+    required_fields = ['content', 'star', 'item', 'author']
     missing_fields = [field for field in required_fields if field not in data]
 
     if missing_fields:
@@ -74,5 +74,13 @@ def delete_review(request, id):
         return Response({'success': True, 'message': 'Review deleted successfully'})
     except Review.DoesNotExist:
         return Response({'success': False, 'message': 'Review not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({'success': False, 'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+@api_view(['GET'])
+def get_review_of_an_item(request, item_id): 
+    try: 
+        reviews = Review.objects.filter(item=item_id)
+        serializer = ReviewSerializer(reviews, many=True)
+        return Response({'success': True, 'message': 'Reviews retrieved successfully', 'data': serializer.data})
     except Exception as e:
         return Response({'success': False, 'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

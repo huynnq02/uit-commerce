@@ -11,6 +11,7 @@ urlpatterns = [
     path('items/update_item', item.update_item, name='update_item'),
     path('items/delete_item/<str:id>', item.delete_item, name='delete_item'),
     path('items/get_all_items', item.get_all_items, name='get_all_items'),
+    path('items/check_item_bought/<str:user_id>/<str:item_id>', item.check_item_bought, name='check_item_bought'),
 
     # Region create shop routers
     path('auth/create_shop', shop.create_shop, name='create_shop'),
@@ -19,6 +20,7 @@ urlpatterns = [
     path('shops/delete_shop/<str:id>', shop.delete_shop, name='delete_shop'),
     path('items/get_all_shop_items/<str:id>', shop.get_all_shop_items, name='get_all_shop_items'),
     path('shops/get_list_customers/<str:id>', shop.get_list_customers, name='get_list_customer'),
+    path('shops/get_statistics/<str:shop_id>', shop.get_statistics, name='get_statistics'),
 
     # Region create category routers
     path('categories/create_category', category.create_category, name='create_category'),
@@ -40,6 +42,7 @@ urlpatterns = [
     path('reviews/delete_review/<str:id>', review.delete_review, name='delete_review'),
     path('reviews/get_all_reviews', review.get_all_reviews, name='get_all_reviews'),
     path('reviews/get_review/<str:id>', review.get_review, name='get_review'),
+    path('reviews/get_review_of_an_item/<str:item_id>', review.get_review_of_an_item, name='get_review_of_an_item'),
 
     # Region create bill routers
     path('bills/create_bill', bill.create_bill, name='create_bill'),

@@ -5,6 +5,7 @@ from ..models import Order, User, Shop, Item
 from ..serializers import OrderSerializer
 from datetime import datetime
 
+import pytz
 
 @api_view(['POST'])
 def create_order(request):
@@ -63,9 +64,9 @@ def create_order(request):
         return Response({'success': False, 'message': str(e)}, status=500)
 
 @api_view(['PUT'])
-def update_order(request, order_id):
+def update_order(request, id):
     try:
-        order = Order.objects.get(id=order_id)
+        order = Order.objects.get(id=id)
 
         if 'user_id' in request.data:
             order.user = request.data.get('user_id')
@@ -131,3 +132,4 @@ def get_shop_orders(request, id):
         return Response({'success': False, 'message': 'Shop not found.'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return Response({'success': False, 'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+

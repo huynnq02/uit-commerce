@@ -31,11 +31,7 @@ class BillSerializer(DocumentSerializer):
         model = Bill
 
 class ReviewSerializer(DocumentSerializer):
-    item = ItemSerializer()
-    user = UserSerializer()
-    order = OrderSerializer()
-    shop = ShopSerializer()
-
+    author = UserSerializer()
     class Meta:
         model = Review
         

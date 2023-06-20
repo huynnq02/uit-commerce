@@ -5,6 +5,8 @@ from django.forms.models import model_to_dict
 from ..models import Shop, Item, User, Order
 import bcrypt
 from ..serializers import ShopSerializer, ItemSerializer, UserSerializer
+from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 
 @api_view(['POST'])
 def create_shop(request):
@@ -86,6 +88,10 @@ def get_all_shop_items(request, id):
         return Response({'success': False, 'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+
 @api_view(['GET'])
 def get_list_customers(request, id):
     """
@@ -103,14 +109,10 @@ def get_list_customers(request, id):
     """
     try:
         shop = Shop.objects.get(id=id)
-        
-      
-        # get list user Id from list order_ids
+
         user_ids = [order.user.id for order in Order.objects.filter(shop=shop)]
-        # get list user from list user_ids
-        print(user_ids)
         users = User.objects.filter(id__in=user_ids)
-        print(users)
+        
         user_info = []
         for user in users:
             orders = Order.objects.filter(user=user, shop=shop)
@@ -118,13 +120,77 @@ def get_list_customers(request, id):
             total_bills = sum(order.total for order in orders)
 
             user_data = {
-                'user': UserSerializer(user).data,
-                'num_orders': total_orders,
-                'total_bills': total_bills
+                'user': {
+                    'id': str(user.id),
+                    'name': user.name,
+                    'phone_number': user.phone_number,
+                    'email': user.email,
+                    'address': user.address,
+                    'password': user.password,
+                    'profile_picture': user.profile_picture,
+                    'orders': user.orders,
+                    'num_orders': total_orders,
+                    'total_bills': total_bills
+                },  
             }
             user_info.append(user_data)
 
         return Response({'success': True, 'message': 'Shop user information fetched successfully', 'data': user_info}, status=status.HTTP_200_OK)
+    except Shop.DoesNotExist:
+        return Response({'success': False, 'message': 'Shop not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({'success': False, 'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['GET'])
+def get_statistics(request, shop_id):
+    try:
+        shop = Shop.objects.get(id=shop_id)
+        current_time = datetime.now()
+        start_date = current_time - relativedelta(months=5)
+        start_date = start_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+        # Include the current month in the range
+        end_date = current_time.replace(day=1, hour=0, minute=0, second=0, microsecond=0) + relativedelta(months=1)
+
+        month_names = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+        sales_last_six_months = {name: 0 for name in month_names}
+        print("current:",current_time)
+        print("start:",start_date)
+        print("end:",end_date)
+
+        orders = Order.objects.filter(shop=shop)
+        for order in orders:
+            order_time = datetime.strptime(order.time[:19], "%Y-%m-%dT%H:%M:%S")
+            print("order_time:",order_time)
+            print()
+            if start_date <= order_time <= end_date:
+                order_month = order_time.month
+                month_name = month_names[order_month - 1]
+                sales_last_six_months[month_name] += order.total
+                print("order_month:",order_month)
+                print("order.total:",order.total)	
+                print("month_name:",month_name)
+                print("sales_last_six_months:",sales_last_six_months)
+        # Calculate the total sales for today
+        today_sales = Order.objects.filter(shop=shop)
+        total_sales_today = sum(order.total for order in today_sales if datetime.strptime(order.time[:19], "%Y-%m-%dT%H:%M:%S").date() == current_time.date())
+
+        # Calculate the total sales for the last week
+        last_week_sales = Order.objects.filter(shop=shop)
+        total_sales_last_week = sum(order.total for order in last_week_sales if (current_time - timedelta(days=7)).date() <= datetime.strptime(order.time[:19], "%Y-%m-%dT%H:%M:%S").date() < current_time.date())
+
+        # Calculate the total sales for the last month
+        last_month_sales = Order.objects.filter(shop=shop)
+        total_sales_last_month = sum(order.total for order in last_month_sales if (current_time - relativedelta(months=1)).date() <= datetime.strptime(order.time[:19], "%Y-%m-%dT%H:%M:%S").date() < current_time.date())
+
+        data = {
+            "sales_last_six_months": sales_last_six_months,
+            "total_sales_today": total_sales_today,
+            "total_sales_last_week": total_sales_last_week,
+            "total_sales_last_month": total_sales_last_month
+        }
+
+        return Response({'success': True, 'message': 'Statistics fetched successfully', 'data': data}, status=status.HTTP_200_OK)
     except Shop.DoesNotExist:
         return Response({'success': False, 'message': 'Shop not found'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:

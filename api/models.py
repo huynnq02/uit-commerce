@@ -64,12 +64,10 @@ class Bill(Document):
         'collection': 'bills'  # Specify the collection name as 'bills'
     }
 class Review(Document):
+    author = ReferenceField(User)
     item = ReferenceField(Item)
-    user = ReferenceField(User)
-    order = ReferenceField(Order)
-    shop = ReferenceField(Shop)
     content = StringField(required=True)
-
+    star = DecimalField(required=True)
     meta = {
         'collection': 'reviews'  # Specify the collection name as 'reviews'
     }

@@ -1,7 +1,7 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from ..models import Item, Shop
+from ..models import Item, Shop, User, Order
 import cloudinary
 import cloudinary.uploader
 from ..serializers import ItemSerializer
@@ -127,6 +127,23 @@ def delete_item(request, id):
     except Item.DoesNotExist:
         return Response({'success': False, 'message': 'Item not found'}, status=status.HTTP_404_NOT_FOUND)
 
+
+@api_view(['GET'])
+def check_item_bought(request, user_id, item_id):
+    try:
+        user = User.objects.get(id=user_id)
+        # get orther that has item_id
+        orders = Order.objects.filter(items__id=item_id)
+        print(orders)
+        for order in orders:
+
+            if order.user == user:
+                return Response({'success': True, 'message': 'Item bought before', 'data': True }, status= 200)
+        return Response({'success': True, 'message': 'Item not bought before', 'data': False }, status= 200)
+    except User.DoesNotExist:
+        return Response({'success': False, 'message': 'User not found'}, status = 404)
+    except Order.DoesNotExist:
+        return Response({'success': False, 'message': 'Order not found'}, status = 404)
 
 
 @api_view(['GET'])
