@@ -12,3 +12,4 @@ django-cors-headers
 python-dotenv
 cloudinary
 python-dateutil
+stripe
