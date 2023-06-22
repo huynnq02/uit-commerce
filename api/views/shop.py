@@ -10,6 +10,19 @@ from dateutil.relativedelta import relativedelta
 
 @api_view(['POST'])
 def create_shop(request):
+    """
+    Create a new shop.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        Response: The HTTP response containing the status of the shop creation.
+
+    Raises:
+        Exception: If any error occurs during the shop creation.
+
+    """
     try:
         name = request.data.get('name')
         email = request.data.get('email')
@@ -24,6 +37,21 @@ def create_shop(request):
 
 @api_view(['PUT'])
 def update_shop(request, shop_id):
+    """
+    Update a shop.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        shop_id (int): The ID of the shop to update.
+
+    Returns:
+        Response: The HTTP response containing the status of the shop update.
+
+    Raises:
+        Shop.DoesNotExist: If the shop with the specified ID does not exist.
+        Exception: If any error occurs during the shop update.
+
+    """
     try:
         shop = Shop.objects.get(id=shop_id)
         shop.name = request.data.get('name', shop.name)
@@ -42,6 +70,21 @@ def update_shop(request, shop_id):
 
 @api_view(['DELETE'])
 def delete_shop(request, shop_id):
+    """
+    Delete a shop.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        shop_id (int): The ID of the shop to delete.
+
+    Returns:
+        Response: The HTTP response containing the status of the shop deletion.
+
+    Raises:
+        Shop.DoesNotExist: If the shop with the specified ID does not exist.
+        Exception: If any error occurs during the shop deletion.
+
+    """
     try:
         shop = Shop.objects.get(id=shop_id)
         shop.delete()
@@ -54,6 +97,20 @@ def delete_shop(request, shop_id):
 
 @api_view(['POST'])
 def login_shop(request):
+    """
+    Authenticate a shop.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        Response: The HTTP response containing the status of the shop authentication.
+
+    Raises:
+        Shop.DoesNotExist: If the shop with the specified email does not exist.
+        Exception: If any error occurs during the shop authentication.
+
+    """
     try:
         email = request.data.get('email')
         password = request.data.get('password')
@@ -77,6 +134,21 @@ def login_shop(request):
 # get all shop items
 @api_view(['GET'])
 def get_all_shop_items(request, id):
+    """
+    Retrieve all items of a shop.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        id (int): The ID of the shop.
+
+    Returns:
+        Response: The HTTP response containing the shop items data.
+
+    Raises:
+        Shop.DoesNotExist: If the shop with the specified ID does not exist.
+        Exception: If any error occurs while retrieving the shop items.
+
+    """
     try:
         shop = Shop.objects.get(id=id)
         items = Item.objects.filter(shop=shop)
@@ -98,6 +170,7 @@ def get_list_customers(request, id):
     Retrieve user information, number of orders, and number of bills for each user associated with a given shop.
 
     Args:
+        request (HttpRequest): The HTTP request object.
         id (str): The ID of the shop.
 
     Returns:
@@ -106,6 +179,7 @@ def get_list_customers(request, id):
     Raises:
         Shop.DoesNotExist: If the shop with the specified ID does not exist.
         Exception: If any other error occurs during the process.
+
     """
     try:
         shop = Shop.objects.get(id=id)
@@ -143,6 +217,21 @@ def get_list_customers(request, id):
 
 @api_view(['GET'])
 def get_statistics(request, shop_id):
+    """
+    Retrieve statistics for a shop.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        shop_id (int): The ID of the shop.
+
+    Returns:
+        Response: The HTTP response containing the shop statistics data.
+
+    Raises:
+        Shop.DoesNotExist: If the shop with the specified ID does not exist.
+        Exception: If any error occurs while retrieving the shop statistics.
+
+    """
     try:
         shop = Shop.objects.get(id=shop_id)
         current_time = datetime.now()

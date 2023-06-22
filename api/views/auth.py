@@ -20,9 +20,10 @@ def create_user(request):
     - password: The password of the user.
 
     Returns:
-    - If the user is successfully created, returns a success message with status 201 CREATED.
-    - If the email already exists, returns an error message with status 409 CONFLICT.
-    - If an error occurs during the process, returns an error message with status 500 INTERNAL SERVER ERROR.
+    Response: The HTTP response indicating the success or failure of the operation.
+
+    Raises:
+    Exception: If any error occurs while creating the user.
     """
     try:
         email = request.data.get('email')
@@ -52,9 +53,11 @@ def update_user(request, id):
     - If the 'picture' field is provided, it will be uploaded to Cloudinary and the URL will be stored in 'profile_picture' field of the user.
 
     Returns:
-    - If the user is successfully updated, returns a success message with status 200 OK, along with the updated user data.
-    - If the user is not found, returns an error message with status 404 NOT FOUND.
-    - If an error occurs during the process, returns an error message with status 500 INTERNAL SERVER ERROR.
+    Response: The HTTP response indicating the success or failure of the operation.
+
+    Raises:
+    User.DoesNotExist: If the user with the specified ID does not exist.
+    Exception: If any error occurs while updating the user.
     """
     try:
         user = User.objects.get(id=id)
@@ -91,10 +94,11 @@ def login_user(request):
     - password: The password of the user.
 
     Returns:
-    - If the email and password match, returns a success message with status 200 OK, along with the user data.
-    - If the email is not found, returns an error message with status 404 NOT FOUND.
-    - If the password is incorrect, returns an error message with status 401 UNAUTHORIZED.
-    - If an error occurs during the process, returns an error message with status 500 INTERNAL SERVER ERROR.
+    Response: The HTTP response indicating the success or failure of the operation.
+
+    Raises:
+    User.DoesNotExist: If the user with the specified email does not exist.
+    Exception: If any error occurs while authenticating and logging in the user.
     """
     try:
         email = request.data.get('email')

@@ -47,6 +47,7 @@ class Order(Document):
     address = StringField()
     total = DecimalField()
     time = StringField()
+    is_paid = BooleanField()
     meta = {
         'collection': 'orders'  # Specify the collection name as 'orders'
     }

@@ -1,14 +1,16 @@
 from django.urls import path
-from .views import auth, item, shop, review, report, bill, order, category
+from .views import auth, item, shop, review, report, bill, order, category, payment
 urlpatterns = [
     # Region create auth routers
+    path('payment', payment.payment_view, name='payment'),
+
     path('auth/create_user', auth.create_user, name='create_user'),
     path('auth/login_user', auth.login_user, name='login_user'),
     path('users/update_user/<str:id>', auth.update_user, name='update_user'),
 
     # Region create item routers
     path('items/create_item/<str:shop_id>', item.create_item, name='create_item'),
-    path('items/update_item', item.update_item, name='update_item'),
+    path('items/update_item/<str:id>', item.update_item, name='update_item'),
     path('items/delete_item/<str:id>', item.delete_item, name='delete_item'),
     path('items/get_all_items', item.get_all_items, name='get_all_items'),
     path('items/check_item_bought/<str:user_id>/<str:item_id>', item.check_item_bought, name='check_item_bought'),

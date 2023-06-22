@@ -6,6 +6,19 @@ from ..serializers import ReportSerializer
 
 @api_view(['POST'])
 def create_report(request):
+    """
+    Create a new report.
+
+    Args:
+        request (HttpRequest): The HTTP request object containing the report data.
+
+    Returns:
+        Response: The HTTP response containing the created report data.
+
+    Raises:
+        Exception: If any error occurs while creating the report.
+
+    """
     data = request.data
     required_fields = ['title', 'description']
     missing_fields = [field for field in required_fields if field not in data]
@@ -24,6 +37,19 @@ def create_report(request):
 
 @api_view(['GET'])
 def get_all_reports(request):
+    """
+    Retrieve all reports.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        Response: The HTTP response containing the retrieved reports data.
+
+    Raises:
+        Exception: If any error occurs while retrieving the reports.
+
+    """
     try:
         reports = Report.objects.all()
         serializer = ReportSerializer(reports, many=True)
@@ -34,6 +60,21 @@ def get_all_reports(request):
 
 @api_view(['GET'])
 def get_report(request, id):
+    """
+    Retrieve a specific report.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        id (int): The ID of the report.
+
+    Returns:
+        Response: The HTTP response containing the retrieved report data.
+
+    Raises:
+        Report.DoesNotExist: If the report with the specified ID does not exist.
+        Exception: If any error occurs while retrieving the report.
+
+    """
     try:
         report = Report.objects.get(id=id)
         serializer = ReportSerializer(report)
@@ -46,6 +87,21 @@ def get_report(request, id):
 
 @api_view(['PUT'])
 def update_report(request, id):
+    """
+    Update a report.
+
+    Args:
+        request (HttpRequest): The HTTP request object containing the updated report data.
+        id (int): The ID of the report.
+
+    Returns:
+        Response: The HTTP response containing the updated report data.
+
+    Raises:
+        Report.DoesNotExist: If the report with the specified ID does not exist.
+        Exception: If any error occurs while updating the report.
+
+    """
     data = request.data
     required_fields = ['title', 'description']
     missing_fields = [field for field in required_fields if field not in data]
@@ -68,6 +124,21 @@ def update_report(request, id):
 
 @api_view(['DELETE'])
 def delete_report(request, id):
+    """
+    Delete a report.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        id (int): The ID of the report.
+
+    Returns:
+        Response: The HTTP response indicating the success or failure of the delete operation.
+
+    Raises:
+        Report.DoesNotExist: If the report with the specified ID does not exist.
+        Exception: If any error occurs while deleting the report.
+
+    """
     try:
         report = Report.objects.get(id=id)
         report.delete()

@@ -9,6 +9,22 @@ import pytz
 
 @api_view(['POST'])
 def create_order(request):
+    """
+    Create a new order.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        Response: The HTTP response indicating the success or failure of the operation.
+
+    Raises:
+        User.DoesNotExist: If the user with the specified ID does not exist.
+        Item.DoesNotExist: If any of the items with the specified IDs do not exist.
+        Shop.DoesNotExist: If the shop for any item with the specified ID does not exist.
+        Exception: If any error occurs while creating the order.
+
+    """
     try:
         user_id = request.data.get('user_id')
         items = request.data.get('items')
@@ -16,7 +32,7 @@ def create_order(request):
         status = request.data.get('status')
         address = request.data.get('address')
         total = request.data.get('total')
-
+        is_paid = request.data.get('is_paid')
         # Retrieve the user
         try:
             user = User.objects.get(id=user_id)
@@ -49,7 +65,7 @@ def create_order(request):
         orders = []
         for shop_id, shop_items in items_by_shop.items():
             shop = Shop.objects.get(id=shop_id)
-            order = Order(user=user, shop=shop, items=shop_items, time=time, status=status, address=address, total=total)
+            order = Order(user=user, shop=shop, items=shop_items, time=time, status=status, address=address, total=total, is_paid = is_paid)
             order.save()
             orders.append(order)
             for item in shop_items:
@@ -65,6 +81,21 @@ def create_order(request):
 
 @api_view(['PUT'])
 def update_order(request, id):
+    """
+    Update an existing order.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        id (int): The ID of the order to update.
+
+    Returns:
+        Response: The HTTP response indicating the success or failure of the operation.
+
+    Raises:
+        Order.DoesNotExist: If the order with the specified ID does not exist.
+        Exception: If any error occurs while updating the order.
+
+    """
     try:
         order = Order.objects.get(id=id)
 
@@ -93,6 +124,21 @@ def update_order(request, id):
 
 @api_view(['DELETE'])
 def delete_order(request, order_id):
+    """
+    Delete an order.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        order_id (int): The ID of the order to delete.
+
+    Returns:
+        Response: The HTTP response indicating the success or failure of the operation.
+
+    Raises:
+        Order.DoesNotExist: If the order with the specified ID does not exist.
+        Exception: If any error occurs while deleting the order.
+
+    """
     try:
         order = Order.objects.get(id=order_id)
         order.delete()
@@ -105,6 +151,21 @@ def delete_order(request, order_id):
 
 @api_view(['GET'])
 def get_user_orders(request, id):
+    """
+    Get all orders placed by a user.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        id (int): The ID of the user.
+
+    Returns:
+        Response: The HTTP response containing the user's orders.
+
+    Raises:
+        User.DoesNotExist: If the user with the specified ID does not exist.
+        Exception: If any error occurs while fetching the user's orders.
+
+    """
     try:
         user = User.objects.get(id=id)
         orders = Order.objects.filter(user=user)
@@ -123,6 +184,21 @@ def get_user_orders(request, id):
 
 @api_view(['GET'])
 def get_shop_orders(request, id):
+    """
+    Get all orders placed for a shop.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        id (int): The ID of the shop.
+
+    Returns:
+        Response: The HTTP response containing the shop's orders.
+
+    Raises:
+        Shop.DoesNotExist: If the shop with the specified ID does not exist.
+        Exception: If any error occurs while fetching the shop's orders.
+
+    """
     try:
         shop = Shop.objects.get(id=id)
         orders = Order.objects.filter(shop=id)

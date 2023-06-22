@@ -10,6 +10,21 @@ from utils.CustomPagination import CustomPagination
 
 @api_view(['POST'])
 def create_item(request, shop_id):
+    """
+    Create a new item.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        shop_id (int): The ID of the shop to which the item belongs.
+
+    Returns:
+        Response: The HTTP response indicating the success or failure of the operation.
+
+    Raises:
+        Shop.DoesNotExist: If the shop with the specified ID does not exist.
+        Exception: If any error occurs while creating the item.
+
+    """
     data = request.data
 
     try:
@@ -81,35 +96,46 @@ def create_item(request, shop_id):
 
 @api_view(['PUT'])
 def update_item(request, id):
+    """
+    Update an existing item.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        id (int): The ID of the item to update.
+
+    Returns:
+        Response: The HTTP response indicating the success or failure of the operation.
+
+    Raises:
+        Item.DoesNotExist: If the item with the specified ID does not exist.
+        Exception: If any error occurs while updating the item.
+
+    """
     try:
         item = Item.objects.get(id=id)
     except Item.DoesNotExist:
         return Response({'success': False, 'message': 'Item not found'}, status=status.HTTP_404_NOT_FOUND)
 
     data = request.data
-    shop_id = data.get('shop')
 
-    try:
-        shop = Shop.objects.get(id=shop_id)
-    except Shop.DoesNotExist:
-        return Response({'success': False, 'message': 'Shop not found'}, status=status.HTTP_404_NOT_FOUND)
-
-    item.shop = shop
-
-    # Handle main image upload to Cloudinary
-    image_file = request.FILES.get('image')
-    if image_file:
-        uploaded_image = cloudinary.uploader.upload(image_file)
-        item.image = uploaded_image['secure_url']
-
-    # Handle detail images upload to Cloudinary
-    detail_images = request.FILES.getlist('detail_image')
-    uploaded_detail_images = []
-    for detail_image_file in detail_images:
-        uploaded_detail_image = cloudinary.uploader.upload(detail_image_file)
-        uploaded_detail_images.append(uploaded_detail_image['secure_url'])
-
-    item.detail_image = uploaded_detail_images
+    if 'name' in data:
+        item.name = data['name']
+    if 'price' in data:
+        item.price = data['price']
+    if 'discount' in data:
+        item.discount = data['discount']
+    if 'quantity' in data:
+        item.quantity = data['quantity']
+    if 'description' in data:
+        item.description = data['description']
+    if 'colors' in data:
+        item.colors = data['colors']
+    if 'sizes' in data:
+        item.sizes = data['sizes']
+    if 'category' in data:
+        item.category = data['category']
+    if 'active' in data:
+        item.active = data['active']
 
     item.save()
     return Response({'success': True, 'message': 'Item updated successfully'}, status=status.HTTP_200_OK)
@@ -117,6 +143,21 @@ def update_item(request, id):
 
 @api_view(['DELETE'])
 def delete_item(request, id):
+    """
+    Delete an item.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        id (int): The ID of the item to delete.
+
+    Returns:
+        Response: The HTTP response indicating the success or failure of the operation.
+
+    Raises:
+        Item.DoesNotExist: If the item with the specified ID does not exist.
+        Exception: If any error occurs while deleting the item.
+
+    """
     try:
         item = Item.objects.get(id=id)
         shop = item.shop
@@ -130,6 +171,22 @@ def delete_item(request, id):
 
 @api_view(['GET'])
 def check_item_bought(request, user_id, item_id):
+    """
+    Check if an item has been bought by a user.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        user_id (int): The ID of the user.
+        item_id (int): The ID of the item.
+
+    Returns:
+        Response: The HTTP response indicating whether the item has been bought by the user or not.
+
+    Raises:
+        User.DoesNotExist: If the user with the specified ID does not exist.
+        Order.DoesNotExist: If no orders exist for the item.
+
+    """
     try:
         user = User.objects.get(id=user_id)
         # get orther that has item_id
@@ -148,6 +205,19 @@ def check_item_bought(request, user_id, item_id):
 
 @api_view(['GET'])
 def get_all_items(request):
+    """
+    Get all items.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        Response: The paginated HTTP response containing the items.
+
+    Raises:
+        Exception: If any error occurs while retrieving the items.
+
+    """
     try:
         paginator = CustomPagination()
         items = Item.objects.all()

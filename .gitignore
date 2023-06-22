@@ -6,7 +6,6 @@ __pycache__/
 venv/
 env/
 # Secret data
-.env 
 
 # Ignore IDE-specific files
 .idea/
